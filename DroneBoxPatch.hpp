@@ -58,160 +58,160 @@
 class DroneBoxSPatch : public Patch
 {
 private:
-	static const unsigned int BUF_SIZE;
-	static const unsigned int BUF_MASK;
-	static const float MAX_FBK;
-	static const float MIN_DT_SAMPLES;
-	static const int NUM_COMBS;
-	static const float MIN_PITCH;
-	static const float MAX_PITCH;
-	static const float PITCH_RANGE;
-	static const float MIN_DECAY;
-	static const float MAX_DECAY;
-	static const float DECAY_RANGE;
-	static const float FREQ_RATIOS[4];
+  static const unsigned int BUF_SIZE;
+  static const unsigned int BUF_MASK;
+  static const float MAX_FBK;
+  static const float MIN_DT_SAMPLES;
+  static const int NUM_COMBS;
+  static const float MIN_PITCH;
+  static const float MAX_PITCH;
+  static const float PITCH_RANGE;
+  static const float MIN_DECAY;
+  static const float MAX_DECAY;
+  static const float DECAY_RANGE;
+  static const float FREQ_RATIOS[4];
 
-	inline float midi2CPS(float pitch, float tune = 440.)
-	{
-		return tune * pow(2., (pitch - 69.) / 12.);
-	}
+  inline float midi2CPS(float pitch, float tune = 440.)
+  {
+    return tune * pow(2., (pitch - 69.) / 12.);
+  }
 
-	class PSmooth
-	{
-	private:
-		float mA, mB;
-		float mOutM1;
-		
-	public:
-		PSmooth(float coeff = 0.99, float initalValue = 0.)
-		: mA(coeff)
-		, mB(1. - mA)
-		, mOutM1(initalValue)
-		{
-		}
-	
-		inline float process(float input)
-		{
-			mOutM1 = (input * mB) + (mOutM1 * mA);
-			return mOutM1;
-		}
-	};
+  class PSmooth
+  {
+  private:
+    float mA, mB;
+    float mOutM1;
+    
+  public:
+    PSmooth(float coeff = 0.99, float initalValue = 0.)
+    : mA(coeff)
+    , mB(1. - mA)
+    , mOutM1(initalValue)
+    {
+    }
+  
+    inline float process(float input)
+    {
+      mOutM1 = (input * mB) + (mOutM1 * mA);
+      return mOutM1;
+    }
+  };
 
-	class DCBlocker
-	{
-	private:
-		float mSampleRate;
-		float mInM1, mOutM1;
-		float mC;
-	public:
-		DCBlocker()
-		: mInM1(0.)
-		, mOutM1(0.)
-		, mSampleRate(AUDIO_SAMPLINGRATE)
-		, mC(1. - ( 126. / mSampleRate))
-		{
-		}
-	
-		inline float process(float input)
-		{
-			mOutM1 = input - mInM1 + mC * mOutM1;
-			mInM1 = input;
-			return mOutM1;
-		}
-		
-		void setSampleRate(float sr)
-		{
-			mSampleRate = sr;
-			mC = 1. - ( 126. / mSampleRate);
-		}
-	};
+  class DCBlocker
+  {
+  private:
+    float mSampleRate;
+    float mInM1, mOutM1;
+    float mC;
+  public:
+    DCBlocker()
+    : mInM1(0.)
+    , mOutM1(0.)
+    , mSampleRate(AUDIO_SAMPLINGRATE)
+    , mC(1. - ( 126. / mSampleRate))
+    {
+    }
+  
+    inline float process(float input)
+    {
+      mOutM1 = input - mInM1 + mC * mOutM1;
+      mInM1 = input;
+      return mOutM1;
+    }
+    
+    void setSampleRate(float sr)
+    {
+      mSampleRate = sr;
+      mC = 1. - ( 126. / mSampleRate);
+    }
+  };
 
-	class DBCombFilter 
-	{
-		inline float wrap(float x, const float lo = 0., const float hi = 1.)
-		{
-			while (x >= hi) x -= hi;
-			while (x < lo)  x += hi - lo;
-	
-			return x;
-		}
-	
-	private:
-		float mSampleRate;
-		float* mBufferL; // left input
-		float* mBufferR; // right input
-		int mDTSamples;
-		float mFbkScalar;
-		int mWriteAddr;
-		
-	public:
-		DBCombFilter()
-		: mDTSamples(0)
-		, mFbkScalar(0.5)
-		, mWriteAddr(0)
-		, mSampleRate(AUDIO_SAMPLINGRATE)
-		{
-			setFreqCPS(440.);
-			setDecayTimeMs(10.);
-		}
-	
-		void setBuffer(float* bufferL, float* bufferR)
-		{
-			mBufferL = bufferL;
-			mBufferR = bufferR;
-		}
-	
-		void clearBuffer()
-		{
-			memset(mBufferL, 0., BUF_SIZE*sizeof(float));
-			memset(mBufferR, 0., BUF_SIZE*sizeof(float));
-		}
-	
-		void setFreqCPS(float freqCPS)
-		{
-			mDTSamples = DB_CLIP(mSampleRate/freqCPS, MIN_DT_SAMPLES, BUF_SIZE);
-		}
-	
-		// call after setting the frequency
-		void setDecayTimeMs(float decayTimeMs)
-		{
-			float fbk = pow(10, ((-60. / ( ( abs(decayTimeMs) * (mSampleRate / 1000.) ) / mDTSamples)) / 20.));
-			mFbkScalar = DB_CLIP(fbk, 0., MAX_FBK);
-		}
-		
-		void setSampleRate(float sr)
-		{
-			mSampleRate = sr;
-		}
-	
-		inline void process(float inputL, float inputR, float* acccumOutputL, float* acccumOutputR)
-		{
-			float readAddrF = ( (float) mWriteAddr ) - mDTSamples;
-			readAddrF = wrap(readAddrF, 0., (float) BUF_SIZE);
-		
-			// Linear interpolation
-			const int intPart = (int) readAddrF;
-			const float fracPart = readAddrF-intPart;
-			const int wrappedIntPart = intPart & BUF_MASK;
-			const int wrappedIntPartPlusOne = (intPart+1) & BUF_MASK;
+  class DBCombFilter 
+  {
+    inline float wrap(float x, const float lo = 0., const float hi = 1.)
+    {
+      while (x >= hi) x -= hi;
+      while (x < lo)  x += hi - lo;
+  
+      return x;
+    }
+  
+  private:
+    float mSampleRate;
+    float* mBufferL; // left input
+    float* mBufferR; // right input
+    int mDTSamples;
+    float mFbkScalar;
+    int mWriteAddr;
+    
+  public:
+    DBCombFilter()
+    : mDTSamples(0)
+    , mFbkScalar(0.5)
+    , mWriteAddr(0)
+    , mSampleRate(AUDIO_SAMPLINGRATE)
+    {
+      setFreqCPS(440.);
+      setDecayTimeMs(10.);
+    }
+  
+    void setBuffer(float* bufferL, float* bufferR)
+    {
+      mBufferL = bufferL;
+      mBufferR = bufferR;
+    }
+  
+    void clearBuffer()
+    {
+      memset(mBufferL, 0., BUF_SIZE*sizeof(float));
+      memset(mBufferR, 0., BUF_SIZE*sizeof(float));
+    }
+  
+    void setFreqCPS(float freqCPS)
+    {
+      mDTSamples = DB_CLIP(mSampleRate/freqCPS, MIN_DT_SAMPLES, BUF_SIZE);
+    }
+  
+    // call after setting the frequency
+    void setDecayTimeMs(float decayTimeMs)
+    {
+      float fbk = pow(10, ((-60. / ( ( abs(decayTimeMs) * (mSampleRate / 1000.) ) / mDTSamples)) / 20.));
+      mFbkScalar = DB_CLIP(fbk, 0., MAX_FBK);
+    }
+    
+    void setSampleRate(float sr)
+    {
+      mSampleRate = sr;
+    }
+  
+    inline void process(float inputL, float inputR, float* acccumOutputL, float* acccumOutputR)
+    {
+      float readAddrF = ( (float) mWriteAddr ) - mDTSamples;
+      readAddrF = wrap(readAddrF, 0., (float) BUF_SIZE);
+    
+      // Linear interpolation
+      const int intPart = (int) readAddrF;
+      const float fracPart = readAddrF-intPart;
+      const int wrappedIntPart = intPart & BUF_MASK;
+      const int wrappedIntPartPlusOne = (intPart+1) & BUF_MASK;
 
-			float a = mBufferL[wrappedIntPart];
-			float b = mBufferL[wrappedIntPartPlusOne];
-			const float outputL = a + (b - a) * fracPart;
+      float a = mBufferL[wrappedIntPart];
+      float b = mBufferL[wrappedIntPartPlusOne];
+      const float outputL = a + (b - a) * fracPart;
 
-			a = mBufferR[wrappedIntPart];
-			b = mBufferR[wrappedIntPartPlusOne];
-			const float outputR = a + (b - a) * fracPart;
-		
-			mBufferL[mWriteAddr] = inputL + (outputL * mFbkScalar);
-			mBufferR[mWriteAddr] = inputR + (outputR * mFbkScalar);
-			mWriteAddr++;
-			mWriteAddr &= BUF_MASK;
-		
-			*acccumOutputL += outputL;
-			*acccumOutputR += outputR;
-		}
-	};
+      a = mBufferR[wrappedIntPart];
+      b = mBufferR[wrappedIntPartPlusOne];
+      const float outputR = a + (b - a) * fracPart;
+    
+      mBufferL[mWriteAddr] = inputL + (outputL * mFbkScalar);
+      mBufferR[mWriteAddr] = inputR + (outputR * mFbkScalar);
+      mWriteAddr++;
+      mWriteAddr &= BUF_MASK;
+    
+      *acccumOutputL += outputL;
+      *acccumOutputR += outputR;
+    }
+  };
 
 private:
   DBCombFilter mCombs[4];
