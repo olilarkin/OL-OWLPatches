@@ -6,14 +6,10 @@ declare version "0.1";
 declare licence "GPL";
 
 import("IIRHilbert.dsp");
+import("filter.lib");
 
-time = (+(1)~_ ) - 1;
-decimal(x) = x - floor(x);
-tablesize = 1 << 9;
-phase(freq) = freq/float(samplingfreq) : (+ : decimal) ~ _ : *(float(tablesize));
-sintable = float(time)*(2.0*PI)/float(tablesize) : sin;
-smooth(s) = *(1.0 - s) : + ~ *(s);
-tau2pole(tau) = exp(-1.0/(tau*SR));
+lutsize = 1 << 9;
+sintable = float(time)*(2.0*PI)/float(lutsize) : sin;
 
 rate = hslider("Rate [unit:hz] [OWL:PARAMETER_A]", 0, 0., 1, 0.001);
 rateScalar = hslider("Rate Scalar [OWL:PARAMETER_B]", 1., 1., 100, 0.001);
@@ -22,13 +18,13 @@ mix = hslider("Mix [OWL:PARAMETER_D]",0.5,0,1,0.01) : smooth(tau2pole(0.005));
 
 quadlookup(phase)=ss1+d*(ss2-ss1), sc1+d*(sc2-sc1)
 with {
-  sini = int(phase * tablesize); 
-  d = decimal(phase * tablesize);
-  cosi = int(fmod((phase * tablesize)+(tablesize*0.25), tablesize));  
-  ss1 = rdtable(tablesize+1,sintable,sini);
-  ss2 = rdtable(tablesize+1,sintable,sini+1);
-  sc1 = rdtable(tablesize+1,sintable,cosi);
-  sc2 = rdtable(tablesize+1,sintable,cosi+1);
+  sini = int(phase * lutsize); 
+  d = decimal(phase * lutsize);
+  cosi = int(fmod((phase * lutsize)+(lutsize*0.25), lutsize));  
+  ss1 = rdtable(lutsize+1,sintable,sini);
+  ss2 = rdtable(lutsize+1,sintable,sini+1);
+  sc1 = rdtable(lutsize+1,sintable,cosi);
+  sc2 = rdtable(lutsize+1,sintable,cosi+1);
 };
 
 hilbert = hilbertef;
