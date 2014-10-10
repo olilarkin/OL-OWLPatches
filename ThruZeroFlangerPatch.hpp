@@ -381,11 +381,32 @@ class ThruZeroFlanger : public dsp {
   public:
 	static void metadata(Meta* m) 	{ 
 		m->declare("name", "Thru Zero Flanger");
-		m->declare("description", "Stereo Thru Zero Flanger");
+		m->declare("description", "Stereo Thru Zero Flanger - warning can ZERO the sound!");
 		m->declare("author", "Oli Larkin (contact@olilarkin.co.uk)");
 		m->declare("copyright", "Oliver Larkin");
 		m->declare("version", "0.1");
 		m->declare("licence", "GPL");
+		m->declare("effect.lib/name", "Faust Audio Effect Library");
+		m->declare("effect.lib/author", "Julius O. Smith (jos at ccrma.stanford.edu)");
+		m->declare("effect.lib/copyright", "Julius O. Smith III");
+		m->declare("effect.lib/version", "1.33");
+		m->declare("effect.lib/license", "STK-4.3");
+		m->declare("effect.lib/exciter_name", "Harmonic Exciter");
+		m->declare("effect.lib/exciter_author", "Priyanka Shekar (pshekar@ccrma.stanford.edu)");
+		m->declare("effect.lib/exciter_copyright", "Copyright (c) 2013 Priyanka Shekar");
+		m->declare("effect.lib/exciter_version", "1.0");
+		m->declare("effect.lib/exciter_license", "MIT License (MIT)");
+		m->declare("filter.lib/name", "Faust Filter Library");
+		m->declare("filter.lib/author", "Julius O. Smith (jos at ccrma.stanford.edu)");
+		m->declare("filter.lib/copyright", "Julius O. Smith III");
+		m->declare("filter.lib/version", "1.29");
+		m->declare("filter.lib/license", "STK-4.3");
+		m->declare("filter.lib/reference", "https://ccrma.stanford.edu/~jos/filters/");
+		m->declare("music.lib/name", "Music Library");
+		m->declare("music.lib/author", "GRAME");
+		m->declare("music.lib/copyright", "GRAME");
+		m->declare("music.lib/version", "1.0");
+		m->declare("music.lib/license", "LGPL with exception");
 		m->declare("math.lib/name", "Math Library");
 		m->declare("math.lib/author", "GRAME");
 		m->declare("math.lib/copyright", "GRAME");
