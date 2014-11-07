@@ -6,6 +6,7 @@ declare version "0.1";
 declare licence "GPL";
 
 import("math.lib");
+import("filter.lib"); 
 
 msec = SR/1000.0;
 shiftl = hslider("Shift L [unit:semitones] [OWL:PARAMETER_A]", 0, -12, +12, 0.1);
@@ -14,8 +15,6 @@ ws = hslider("Window Size [unit:ms] [OWL:PARAMETER_C]", 50, 20, 1000, 1) * msec 
 mix = hslider("Mix[OWL:PARAMETER_D]",0.5,0,1,0.01) : smooth(tau2pole(0.005));
 
 xf = 20 * msec;
-smooth(s) = *(1.0 - s) : + ~ *(s);
-tau2pole(tau) = exp(-1.0/(tau*SR));
 
 transpose (w, x, s, sig) = fdelay(65536, d,sig)*fmin(d/x,1) + fdelay(65536,d+w,sig)*(1-fmin(d/x,1))
 with {
