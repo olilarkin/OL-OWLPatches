@@ -5,7 +5,7 @@ vstdir = "/Library/Audio/Plug-Ins/VST/MyFaust"
 faustFiles = glob.glob("*.dsp")
 
 for file in faustFiles:
-  if(file != "IIRHilbert.dsp"):
+  if(file != "IIRHilbert.dsp" || file != "FrequencyShifter.dsp"):
     command = ["faust2vst", file]
     subprocess.call(command)
     

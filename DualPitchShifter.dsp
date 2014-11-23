@@ -1,5 +1,5 @@
 declare name "Dual Pitch Shifter";
-declare description "Stereo pitch shifter, based on Faust pitch_shifter.dsp by Grame";
+declare description "Dual Channel pitch shifter, based on Faust pitch_shifter.dsp by Grame";
 declare author "Oli Larkin (contact@olilarkin.co.uk)";
 declare copyright "Oliver Larkin";
 declare version "0.1";
