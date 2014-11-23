@@ -11,20 +11,21 @@ import("math.lib");
 
 lutsize = 1 << 9;
 maxdtms = 20;
+smooth_time = 0.005;
 
 rate = hslider("Rate [unit:hz] [OWL:PARAMETER_A]", 0.1, 0., 1, 0.001);
-dt = hslider("Delay [unit:ms] [OWL:PARAMETER_B]", 10., 0.5, maxdtms, 0.01) : smooth(tau2pole(0.005));
-lr_offset = hslider("L-R Offset [OWL:PARAMETER_C]", 0, 0., 1, 0.001) *(0.5) : smooth(tau2pole(0.005));
-depth = hslider("Depth [unit:ms] [OWL:PARAMETER_D]", 20., 3., 100., 1) *(0.01): smooth(tau2pole(0.005));
+dt = hslider("Delay [unit:ms] [OWL:PARAMETER_B]", 10., 0.5, maxdtms, 0.01) : smooth(tau2pole(smooth_time));
+lr_offset = hslider("L-R Offset [OWL:PARAMETER_C]", 0, 0., 1, 0.001) *(0.5) : smooth(tau2pole(smooth_time));
+depth = hslider("Depth [unit:ms] [OWL:PARAMETER_D]", 20., 3., 100., 1) *(0.01): smooth(tau2pole(smooth_time));
 
 tbllookup(phase)=s1+d*(s2-s1)
 with {
   i = int(phase * lutsize); 
   d = decimal(phase * lutsize);
-  triwaveform = triangle((float(time)/float(lutsize))*2*PI);
-  triangle(t) = ((0<=t) & (t<=PI))*((2*t-PI)/PI) + ((PI<t) & (t<=2*PI))*((3*PI-2*t)/PI);
-  s1 = rdtable(lutsize+1,triwaveform,i);
-  s2 = rdtable(lutsize+1,triwaveform,i+1);
+  triangle_table = triangle_phasor(float(time)/float(lutsize));
+  triangle_phasor(t) = ((0<=t) & (t<=0.5))*((2*t-0.5)/0.5) + ((0.5<t) & (t<=1.))*((1.5-2*t)/0.5);
+  s1 = rdtable(lutsize+1, triangle_table, i);
+  s2 = rdtable(lutsize+1, triangle_table, i+1);
 };
 
 tzflangeunit(x, offset) = staticdelay(x) + moddelay(x)
