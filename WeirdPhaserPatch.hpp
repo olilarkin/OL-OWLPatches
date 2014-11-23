@@ -4,7 +4,7 @@
 // copyright: "Oliver Larkin"
 // version: "0.1"
 //
-// Code generated with Faust 0.9.67 (http://faust.grame.fr)
+// Code generated with Faust 0.9.70 (http://faust.grame.fr)
 //-----------------------------------------------------
 /* link with  */
 #include <math.h>

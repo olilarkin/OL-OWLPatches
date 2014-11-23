@@ -4,7 +4,7 @@
 // copyright: "Oliver Larkin"
 // version: "0.1"
 //
-// Code generated with Faust 0.9.67 (http://faust.grame.fr)
+// Code generated with Faust 0.9.70 (http://faust.grame.fr)
 //-----------------------------------------------------
 /* link with  */
 #include <math.h>
@@ -419,7 +419,7 @@ class Blipper : public dsp {
 		fConst2 = (1.0f / float(iConst0));
 		fConst3 = float(iConst0);
 		fConst4 = (1.0f / fConst3);
-		fslider0 = 1.0f;
+		fslider0 = 2.0f;
 		fslider1 = 2e+01f;
 		for (int i=0; i<2; i++) fRec1[i] = 0;
 		for (int i=0; i<2; i++) fRec0[i] = 0;
@@ -446,7 +446,7 @@ class Blipper : public dsp {
 		interface->openVerticalBox("0x00");
 		interface->declare(&fslider0, "OWL", "PARAMETER_C");
 		interface->declare(&fslider0, "unit", "ms");
-		interface->addHorizontalSlider("Attack", &fslider0, 1.0f, 0.0f, 1e+03f, 1.0f);
+		interface->addHorizontalSlider("Attack", &fslider0, 2.0f, 2.0f, 1e+03f, 1.0f);
 		interface->declare(&fslider2, "OWL", "PARAMETER_A");
 		interface->declare(&fslider2, "unit", "semitones");
 		interface->addHorizontalSlider("BasePitch", &fslider2, 6e+01f, 24.0f, 96.0f, 0.1f);
@@ -455,7 +455,7 @@ class Blipper : public dsp {
 		interface->addHorizontalSlider("PitchMod", &fslider3, 24.0f, -64.0f, 64.0f, 1.0f);
 		interface->declare(&fslider1, "OWL", "PARAMETER_D");
 		interface->declare(&fslider1, "unit", "ms");
-		interface->addHorizontalSlider("Release", &fslider1, 2e+01f, 0.0f, 1e+03f, 1.0f);
+		interface->addHorizontalSlider("Release", &fslider1, 2e+01f, 2.0f, 1e+03f, 1.0f);
 		interface->closeBox();
 	}
 	virtual void compute (int count, FAUSTFLOAT** input, FAUSTFLOAT** output) {

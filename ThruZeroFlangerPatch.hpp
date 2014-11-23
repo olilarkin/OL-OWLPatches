@@ -4,7 +4,7 @@
 // copyright: "Oliver Larkin"
 // version: "0.1"
 //
-// Code generated with Faust 0.9.67 (http://faust.grame.fr)
+// Code generated with Faust 0.9.70 (http://faust.grame.fr)
 //-----------------------------------------------------
 /* link with  */
 #include <math.h>
@@ -348,9 +348,9 @@ class ThruZeroFlanger : public dsp {
 			for (int i=0; i<count; i++) {
 				iRec2[0] = (1 + iRec2[1]);
 				float fTemp2 = float((iRec2[0] - 1));
-				float fTemp3 = (0.01227184630308513f * fTemp2);
-				float fTemp4 = (0.02454369260617026f * fTemp2);
-				output[i] = (0.3183098861837907f * ((((0 <= fTemp3) & (fTemp3 <= 3.141592653589793f)) * (fTemp4 - 3.141592653589793f)) + (((3.141592653589793f < fTemp3) & (fTemp3 <= 6.283185307179586f)) * (9.42477796076938f - fTemp4))));
+				float fTemp3 = (0.001953125f * fTemp2);
+				float fTemp4 = (0.00390625f * fTemp2);
+				output[i] = (2.0f * ((((0 <= fTemp3) & (fTemp3 <= 0.5f)) * (fTemp4 - 0.5f)) + (((0.5f < fTemp3) & (fTemp3 <= 1.0f)) * (1.5f - fTemp4))));
 				// post processing
 				iRec2[1] = iRec2[0];
 			}
