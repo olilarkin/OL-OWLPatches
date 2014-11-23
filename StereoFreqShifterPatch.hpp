@@ -1,5 +1,5 @@
 //-----------------------------------------------------
-// name: "Dual Pitch Shifter"
+// name: "Dual Frequency Shifter"
 // author: "Oli Larkin (contact@olilarkin.co.uk)"
 // copyright: "Oliver Larkin"
 // version: "0.1"
@@ -44,8 +44,8 @@
  ************************************************************************
  ************************************************************************/
 
-#ifndef __DualPitchShifterPatch_h__
-#define __DualPitchShifterPatch_h__
+#ifndef __StereoFreqShifterPatch_h__
+#define __StereoFreqShifterPatch_h__
 
 #include "StompBox.h"
 #include "owlcontrol.h"
@@ -328,35 +328,53 @@ class OwlUI : public UI
 typedef long double quad;
 
 #ifndef FAUSTCLASS 
-#define FAUSTCLASS DualPitchShifter
+#define FAUSTCLASS StereoFreqShifter
 #endif
 
-class DualPitchShifter : public dsp {
+class StereoFreqShifter : public dsp {
   private:
-	int 	IOTA;
-	float 	fVec0[65536];
-	float 	fVec1[65536];
+	int 	iVec0[2];
 	int 	iConst0;
 	float 	fConst1;
 	float 	fConst2;
 	FAUSTFLOAT 	fslider0;
 	float 	fRec0[2];
-	FAUSTFLOAT 	fslider1;
 	float 	fConst3;
+	FAUSTFLOAT 	fslider1;
 	FAUSTFLOAT 	fslider2;
-	float 	fRec2[2];
 	float 	fRec1[2];
-	float 	fConst4;
+	float 	fRec2[2];
+	float 	fRec4[3];
+	float 	fRec3[3];
+	float 	fRec6[3];
+	float 	fRec5[3];
 	FAUSTFLOAT 	fslider3;
-	float 	fRec3[2];
+	float 	fRec7[2];
+	float 	fRec8[2];
   public:
 	static void metadata(Meta* m) 	{ 
-		m->declare("name", "Dual Pitch Shifter");
-		m->declare("description", "Dual Channel pitch shifter, based on Faust pitch_shifter.dsp by Grame");
+		m->declare("name", "Dual Frequency Shifter");
+		m->declare("description", "Stereo Frequency Shifting");
 		m->declare("author", "Oli Larkin (contact@olilarkin.co.uk)");
 		m->declare("copyright", "Oliver Larkin");
 		m->declare("version", "0.1");
 		m->declare("licence", "GPL");
+		m->declare("effect.lib/name", "Faust Audio Effect Library");
+		m->declare("effect.lib/author", "Julius O. Smith (jos at ccrma.stanford.edu)");
+		m->declare("effect.lib/copyright", "Julius O. Smith III");
+		m->declare("effect.lib/version", "1.33");
+		m->declare("effect.lib/license", "STK-4.3");
+		m->declare("effect.lib/exciter_name", "Harmonic Exciter");
+		m->declare("effect.lib/exciter_author", "Priyanka Shekar (pshekar@ccrma.stanford.edu)");
+		m->declare("effect.lib/exciter_copyright", "Copyright (c) 2013 Priyanka Shekar");
+		m->declare("effect.lib/exciter_version", "1.0");
+		m->declare("effect.lib/exciter_license", "MIT License (MIT)");
+		m->declare("filter.lib/name", "Faust Filter Library");
+		m->declare("filter.lib/author", "Julius O. Smith (jos at ccrma.stanford.edu)");
+		m->declare("filter.lib/copyright", "Julius O. Smith III");
+		m->declare("filter.lib/version", "1.29");
+		m->declare("filter.lib/license", "STK-4.3");
+		m->declare("filter.lib/reference", "https://ccrma.stanford.edu/~jos/filters/");
 		m->declare("music.lib/name", "Music Library");
 		m->declare("music.lib/author", "GRAME");
 		m->declare("music.lib/copyright", "GRAME");
@@ -367,12 +385,11 @@ class DualPitchShifter : public dsp {
 		m->declare("math.lib/copyright", "GRAME");
 		m->declare("math.lib/version", "1.0");
 		m->declare("math.lib/license", "LGPL with exception");
-		m->declare("filter.lib/name", "Faust Filter Library");
-		m->declare("filter.lib/author", "Julius O. Smith (jos at ccrma.stanford.edu)");
-		m->declare("filter.lib/copyright", "Julius O. Smith III");
-		m->declare("filter.lib/version", "1.29");
-		m->declare("filter.lib/license", "STK-4.3");
-		m->declare("filter.lib/reference", "https://ccrma.stanford.edu/~jos/filters/");
+		m->declare("oscillator.lib/name", "Faust Oscillator Library");
+		m->declare("oscillator.lib/author", "Julius O. Smith (jos at ccrma.stanford.edu)");
+		m->declare("oscillator.lib/copyright", "Julius O. Smith III");
+		m->declare("oscillator.lib/version", "1.11");
+		m->declare("oscillator.lib/license", "STK-4.3");
 	}
 
 	virtual int getNumInputs() 	{ return 2; }
@@ -381,22 +398,24 @@ class DualPitchShifter : public dsp {
 	}
 	virtual void instanceInit(int samplingFreq) {
 		fSamplingFreq = samplingFreq;
-		IOTA = 0;
-		for (int i=0; i<65536; i++) fVec0[i] = 0;
-		for (int i=0; i<65536; i++) fVec1[i] = 0;
+		for (int i=0; i<2; i++) iVec0[i] = 0;
 		iConst0 = min(192000, max(1, fSamplingFreq));
 		fConst1 = expf((0 - (2e+02f / float(iConst0))));
 		fConst2 = (1.0f - fConst1);
 		fslider0 = 0.5f;
 		for (int i=0; i<2; i++) fRec0[i] = 0;
+		fConst3 = (6.283185307179586f / float(iConst0));
 		fslider1 = 0.0f;
-		fConst3 = (0.001f * (iConst0 * fConst2));
-		fslider2 = 5e+01f;
-		for (int i=0; i<2; i++) fRec2[i] = 0;
+		fslider2 = 1.0f;
 		for (int i=0; i<2; i++) fRec1[i] = 0;
-		fConst4 = (5e+01f / float(iConst0));
+		for (int i=0; i<2; i++) fRec2[i] = 0;
+		for (int i=0; i<3; i++) fRec4[i] = 0;
+		for (int i=0; i<3; i++) fRec3[i] = 0;
+		for (int i=0; i<3; i++) fRec6[i] = 0;
+		for (int i=0; i<3; i++) fRec5[i] = 0;
 		fslider3 = 0.0f;
-		for (int i=0; i<2; i++) fRec3[i] = 0;
+		for (int i=0; i<2; i++) fRec7[i] = 0;
+		for (int i=0; i<2; i++) fRec8[i] = 0;
 	}
 	virtual void init(int samplingFreq) {
 		classInit(samplingFreq);
@@ -404,58 +423,65 @@ class DualPitchShifter : public dsp {
 	}
 	virtual void buildUserInterface(UI* interface) {
 		interface->openVerticalBox("0x00");
+		interface->declare(&fslider3, "OWL", "PARAMETER_C");
+		interface->addHorizontalSlider("L-R Offset", &fslider3, 0.0f, 0.0f, 1.0f, 1e-05f);
 		interface->declare(&fslider0, "OWL", "PARAMETER_D");
 		interface->addHorizontalSlider("Mix", &fslider0, 0.5f, 0.0f, 1.0f, 0.01f);
+		interface->declare(&fslider2, "OWL", "PARAMETER_B");
+		interface->addHorizontalSlider("Shift Scalar", &fslider2, 1.0f, 1.0f, 1e+02f, 0.1f);
 		interface->declare(&fslider1, "OWL", "PARAMETER_A");
-		interface->declare(&fslider1, "unit", "semitones");
-		interface->addHorizontalSlider("Shift L", &fslider1, 0.0f, -12.0f, 12.0f, 0.1f);
-		interface->declare(&fslider3, "OWL", "PARAMETER_B");
-		interface->declare(&fslider3, "unit", "semitones");
-		interface->addHorizontalSlider("Shift R", &fslider3, 0.0f, -12.0f, 12.0f, 0.1f);
-		interface->declare(&fslider2, "OWL", "PARAMETER_C");
-		interface->declare(&fslider2, "unit", "ms");
-		interface->addHorizontalSlider("Window Size", &fslider2, 5e+01f, 2e+01f, 1e+03f, 1.0f);
+		interface->declare(&fslider1, "unit", "hz");
+		interface->addHorizontalSlider("Shift", &fslider1, 0.0f, -1.0f, 1.0f, 0.001f);
 		interface->closeBox();
 	}
 	virtual void compute (int count, FAUSTFLOAT** input, FAUSTFLOAT** output) {
 		float 	fSlow0 = (fConst2 * float(fslider0));
-		float 	fSlow1 = (1 - powf(2,(0.08333333333333333f * float(fslider1))));
-		float 	fSlow2 = (fConst3 * float(fslider2));
-		float 	fSlow3 = (1 - powf(2,(0.08333333333333333f * float(fslider3))));
+		float 	fSlow1 = (float(fslider1) * float(fslider2));
+		float 	fSlow2 = (fConst3 * fSlow1);
+		float 	fSlow3 = sinf(fSlow2);
+		float 	fSlow4 = cosf(fSlow2);
+		float 	fSlow5 = (0 - fSlow3);
+		float 	fSlow6 = (fConst3 * (fSlow1 + float(fslider3)));
+		float 	fSlow7 = sinf(fSlow6);
+		float 	fSlow8 = cosf(fSlow6);
+		float 	fSlow9 = (0 - fSlow7);
 		FAUSTFLOAT* input0 = input[0];
 		FAUSTFLOAT* input1 = input[1];
 		FAUSTFLOAT* output0 = output[0];
 		FAUSTFLOAT* output1 = output[1];
 		for (int i=0; i<count; i++) {
 			float fTemp0 = (float)input0[i];
-			fVec0[IOTA&65535] = fTemp0;
 			float fTemp1 = (float)input1[i];
-			fVec1[IOTA&65535] = fTemp1;
+			iVec0[0] = 1;
 			fRec0[0] = ((fConst1 * fRec0[1]) + fSlow0);
 			float fTemp2 = (1 - fRec0[0]);
-			fRec2[0] = (fSlow2 + (fConst1 * fRec2[1]));
-			fRec1[0] = fmodf((fSlow1 + (fRec2[0] + fRec1[1])),fRec2[0]);
-			int iTemp3 = int(fRec1[0]);
-			int iTemp4 = (1 + iTemp3);
-			float fTemp5 = min((fConst4 * fRec1[0]), (float)1);
-			float fTemp6 = (fRec2[0] + fRec1[0]);
-			int iTemp7 = int(fTemp6);
-			int iTemp8 = (1 + iTemp7);
-			output0[i] = (FAUSTFLOAT)((fVec0[IOTA&65535] * fTemp2) + (fRec0[0] * ((((fVec0[(IOTA-int((iTemp3 & 65535)))&65535] * (iTemp4 - fRec1[0])) + ((fRec1[0] - iTemp3) * fVec0[(IOTA-int((int(iTemp4) & 65535)))&65535])) * fTemp5) + (((fVec0[(IOTA-int((iTemp7 & 65535)))&65535] * (0 - (fTemp6 - iTemp8))) + ((fTemp6 - iTemp7) * fVec0[(IOTA-int((int(iTemp8) & 65535)))&65535])) * (1 - fTemp5)))));
-			fRec3[0] = fmodf((fSlow3 + (fRec2[0] + fRec3[1])),fRec2[0]);
-			int iTemp9 = int(fRec3[0]);
-			int iTemp10 = (1 + iTemp9);
-			float fTemp11 = min((fConst4 * fRec3[0]), (float)1);
-			float fTemp12 = (fRec2[0] + fRec3[0]);
-			int iTemp13 = int(fTemp12);
-			int iTemp14 = (1 + iTemp13);
-			output1[i] = (FAUSTFLOAT)((fVec1[IOTA&65535] * fTemp2) + (fRec0[0] * ((((fVec1[(IOTA-int((iTemp9 & 65535)))&65535] * (iTemp10 - fRec3[0])) + ((fRec3[0] - iTemp9) * fVec1[(IOTA-int((int(iTemp10) & 65535)))&65535])) * fTemp11) + (((fVec1[(IOTA-int((iTemp13 & 65535)))&65535] * (0 - (fTemp12 - iTemp14))) + ((fTemp12 - iTemp13) * fVec1[(IOTA-int((int(iTemp14) & 65535)))&65535])) * (1 - fTemp11)))));
+			fRec1[0] = ((fSlow3 * fRec2[1]) + (fSlow4 * fRec1[1]));
+			fRec2[0] = ((1 + ((fSlow4 * fRec2[1]) + (fSlow5 * fRec1[1]))) - iVec0[1]);
+			float fTemp3 = (0.02569f * fRec4[1]);
+			fRec4[0] = ((fTemp0 + (0.260502f * fRec4[2])) - fTemp3);
+			float fTemp4 = (1.8685f * fRec3[1]);
+			fRec3[0] = ((fRec4[2] + (fTemp4 + fTemp3)) - ((0.870686f * fRec3[2]) + (0.260502f * fRec4[0])));
+			float fTemp5 = (((0.870686f * fRec3[0]) + fRec3[2]) - fTemp4);
+			float fTemp6 = (1.94632f * fRec6[1]);
+			fRec6[0] = ((fTemp1 + fTemp6) - (0.94657f * fRec6[2]));
+			float fTemp7 = (0.83774f * fRec5[1]);
+			fRec5[0] = ((fRec6[2] + ((0.94657f * fRec6[0]) + fTemp7)) - ((0.06338f * fRec5[2]) + fTemp6));
+			float fTemp8 = (((0.06338f * fRec5[0]) + fRec5[2]) - fTemp7);
+			output0[i] = (FAUSTFLOAT)((fTemp0 * fTemp2) + (fRec0[0] * ((fRec2[0] * fTemp5) - (fRec1[0] * fTemp8))));
+			fRec7[0] = ((fSlow7 * fRec8[1]) + (fSlow8 * fRec7[1]));
+			fRec8[0] = ((1 + ((fSlow8 * fRec8[1]) + (fSlow9 * fRec7[1]))) - iVec0[1]);
+			output1[i] = (FAUSTFLOAT)((fTemp1 * fTemp2) + (fRec0[0] * ((fRec8[0] * fTemp5) - (fRec7[0] * fTemp8))));
 			// post processing
-			fRec3[1] = fRec3[0];
-			fRec1[1] = fRec1[0];
+			fRec8[1] = fRec8[0];
+			fRec7[1] = fRec7[0];
+			fRec5[2] = fRec5[1]; fRec5[1] = fRec5[0];
+			fRec6[2] = fRec6[1]; fRec6[1] = fRec6[0];
+			fRec3[2] = fRec3[1]; fRec3[1] = fRec3[0];
+			fRec4[2] = fRec4[1]; fRec4[1] = fRec4[0];
 			fRec2[1] = fRec2[0];
+			fRec1[1] = fRec1[0];
 			fRec0[1] = fRec0[0];
-			IOTA = IOTA+1;
+			iVec0[1] = iVec0[0];
 		}
 	}
 };
@@ -470,18 +496,18 @@ class DualPitchShifter : public dsp {
 
 /**************************************************************************************
 
-	DualPitchShifterPatch : an OWL patch that calls Faust generated DSP code
+	StereoFreqShifterPatch : an OWL patch that calls Faust generated DSP code
 	
 ***************************************************************************************/
 
-class DualPitchShifterPatch : public Patch
+class StereoFreqShifterPatch : public Patch
 {
-    DualPitchShifter   fDSP;
+    StereoFreqShifter   fDSP;
     OwlUI	fUI;
     
 public:
 
-    DualPitchShifterPatch() : fUI(patches.getCurrentPatchProcessor())
+    StereoFreqShifterPatch() : fUI(patches.getCurrentPatchProcessor())
     {
         fDSP.init(int(getSampleRate()));		// Init Faust code with the OWL sampling rate
         fDSP.buildUserInterface(&fUI);			// Maps owl parameters and faust widgets 
@@ -516,7 +542,7 @@ public:
 
 };
 
-#endif // __DualPitchShifterPatch_h__
+#endif // __StereoFreqShifterPatch_h__
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -354,32 +354,11 @@ class DualFreqShifter : public dsp {
   public:
 	static void metadata(Meta* m) 	{ 
 		m->declare("name", "Dual Frequency Shifter");
-		m->declare("description", "Stereo Frequency Shifting");
+		m->declare("description", "Dual Channel Frequency Shifter");
 		m->declare("author", "Oli Larkin (contact@olilarkin.co.uk)");
 		m->declare("copyright", "Oliver Larkin");
 		m->declare("version", "0.1");
 		m->declare("licence", "GPL");
-		m->declare("math.lib/name", "Math Library");
-		m->declare("math.lib/author", "GRAME");
-		m->declare("math.lib/copyright", "GRAME");
-		m->declare("math.lib/version", "1.0");
-		m->declare("math.lib/license", "LGPL with exception");
-		m->declare("oscillator.lib/name", "Faust Oscillator Library");
-		m->declare("oscillator.lib/author", "Julius O. Smith (jos at ccrma.stanford.edu)");
-		m->declare("oscillator.lib/copyright", "Julius O. Smith III");
-		m->declare("oscillator.lib/version", "1.11");
-		m->declare("oscillator.lib/license", "STK-4.3");
-		m->declare("music.lib/name", "Music Library");
-		m->declare("music.lib/author", "GRAME");
-		m->declare("music.lib/copyright", "GRAME");
-		m->declare("music.lib/version", "1.0");
-		m->declare("music.lib/license", "LGPL with exception");
-		m->declare("filter.lib/name", "Faust Filter Library");
-		m->declare("filter.lib/author", "Julius O. Smith (jos at ccrma.stanford.edu)");
-		m->declare("filter.lib/copyright", "Julius O. Smith III");
-		m->declare("filter.lib/version", "1.29");
-		m->declare("filter.lib/license", "STK-4.3");
-		m->declare("filter.lib/reference", "https://ccrma.stanford.edu/~jos/filters/");
 		m->declare("effect.lib/name", "Faust Audio Effect Library");
 		m->declare("effect.lib/author", "Julius O. Smith (jos at ccrma.stanford.edu)");
 		m->declare("effect.lib/copyright", "Julius O. Smith III");
@@ -390,6 +369,27 @@ class DualFreqShifter : public dsp {
 		m->declare("effect.lib/exciter_copyright", "Copyright (c) 2013 Priyanka Shekar");
 		m->declare("effect.lib/exciter_version", "1.0");
 		m->declare("effect.lib/exciter_license", "MIT License (MIT)");
+		m->declare("filter.lib/name", "Faust Filter Library");
+		m->declare("filter.lib/author", "Julius O. Smith (jos at ccrma.stanford.edu)");
+		m->declare("filter.lib/copyright", "Julius O. Smith III");
+		m->declare("filter.lib/version", "1.29");
+		m->declare("filter.lib/license", "STK-4.3");
+		m->declare("filter.lib/reference", "https://ccrma.stanford.edu/~jos/filters/");
+		m->declare("music.lib/name", "Music Library");
+		m->declare("music.lib/author", "GRAME");
+		m->declare("music.lib/copyright", "GRAME");
+		m->declare("music.lib/version", "1.0");
+		m->declare("music.lib/license", "LGPL with exception");
+		m->declare("math.lib/name", "Math Library");
+		m->declare("math.lib/author", "GRAME");
+		m->declare("math.lib/copyright", "GRAME");
+		m->declare("math.lib/version", "1.0");
+		m->declare("math.lib/license", "LGPL with exception");
+		m->declare("oscillator.lib/name", "Faust Oscillator Library");
+		m->declare("oscillator.lib/author", "Julius O. Smith (jos at ccrma.stanford.edu)");
+		m->declare("oscillator.lib/copyright", "Julius O. Smith III");
+		m->declare("oscillator.lib/version", "1.11");
+		m->declare("oscillator.lib/license", "STK-4.3");
 	}
 
 	virtual int getNumInputs() 	{ return 2; }
@@ -405,7 +405,7 @@ class DualFreqShifter : public dsp {
 		fslider0 = 0.5f;
 		for (int i=0; i<2; i++) fRec0[i] = 0;
 		fConst3 = (6.283185307179586f / float(iConst0));
-		fslider1 = 0.01f;
+		fslider1 = 0.0f;
 		fslider2 = 1.0f;
 		for (int i=0; i<2; i++) fRec1[i] = 0;
 		for (int i=0; i<2; i++) fRec2[i] = 0;
@@ -423,25 +423,25 @@ class DualFreqShifter : public dsp {
 	}
 	virtual void buildUserInterface(UI* interface) {
 		interface->openVerticalBox("0x00");
-		interface->declare(&fslider3, "OWL", "PARAMETER_C");
-		interface->addHorizontalSlider("L-R Offset", &fslider3, 0.0f, 0.0f, 1.0f, 1e-05f);
 		interface->declare(&fslider0, "OWL", "PARAMETER_D");
 		interface->addHorizontalSlider("Mix", &fslider0, 0.5f, 0.0f, 1.0f, 0.01f);
-		interface->declare(&fslider2, "OWL", "PARAMETER_B");
-		interface->addHorizontalSlider("Rate Scalar", &fslider2, 1.0f, 1.0f, 1e+02f, 0.1f);
 		interface->declare(&fslider1, "OWL", "PARAMETER_A");
 		interface->declare(&fslider1, "unit", "hz");
-		interface->addHorizontalSlider("Rate", &fslider1, 0.01f, 0.0f, 1.0f, 0.001f);
+		interface->addHorizontalSlider("Shift L", &fslider1, 0.0f, -1.0f, 1.0f, 0.001f);
+		interface->declare(&fslider3, "unit", "hz");
+		interface->addHorizontalSlider("Shift R", &fslider3, 0.0f, -1.0f, 1.0f, 0.001f);
+		interface->declare(&fslider2, "OWL", "PARAMETER_C");
+		interface->addHorizontalSlider("Shift Scalar", &fslider2, 1.0f, 1.0f, 1e+02f, 0.1f);
 		interface->closeBox();
 	}
 	virtual void compute (int count, FAUSTFLOAT** input, FAUSTFLOAT** output) {
 		float 	fSlow0 = (fConst2 * float(fslider0));
-		float 	fSlow1 = (float(fslider1) * float(fslider2));
-		float 	fSlow2 = (fConst3 * fSlow1);
+		float 	fSlow1 = float(fslider2);
+		float 	fSlow2 = (fConst3 * (float(fslider1) * fSlow1));
 		float 	fSlow3 = sinf(fSlow2);
 		float 	fSlow4 = cosf(fSlow2);
 		float 	fSlow5 = (0 - fSlow3);
-		float 	fSlow6 = (fConst3 * (fSlow1 + float(fslider3)));
+		float 	fSlow6 = (fConst3 * (fSlow1 * float(fslider3)));
 		float 	fSlow7 = sinf(fSlow6);
 		float 	fSlow8 = cosf(fSlow6);
 		float 	fSlow9 = (0 - fSlow7);
