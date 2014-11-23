@@ -1,4 +1,4 @@
-import subprocess, glob, shutil
+import subprocess, glob, shutil, os.path
 
 vstdir = "/Library/Audio/Plug-Ins/VST/MyFaust"
 
@@ -13,5 +13,6 @@ vstFiles = glob.glob("*.vst")
 
 for file in vstFiles:
   outputfile = vstdir + "/" + file
-  shutil.rmtree(outputfile)
+  if os.path.isdir(outputfile):
+    shutil.rmtree(outputfile)
   shutil.move(file, outputfile)
