@@ -12,7 +12,7 @@ msec = SR/1000.0;
 shiftl = hslider("Shift L [unit:semitones] [OWL:PARAMETER_A]", 0, -12, +12, 0.1);
 shiftr = hslider("Shift R [unit:semitones] [OWL:PARAMETER_B]", 0, -12, +12, 0.1);
 ws = hslider("Window Size [unit:ms] [OWL:PARAMETER_C]", 50, 20, 1000, 1) * msec : smooth(tau2pole(0.005));
-mix = hslider("Mix[OWL:PARAMETER_D]",0.5,0,1,0.01) : smooth(tau2pole(0.005));
+mix = hslider("Mix[OWL:PARAMETER_D]", 0.5, 0, 1, 0.01) : smooth(tau2pole(0.005));
 
 xf = 20 * msec;
 

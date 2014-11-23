@@ -12,4 +12,4 @@ with {
   hilbert = hilbertef;
 };
 
-ssb(shift, x) = freqshift(_, shift) : _ , !; // only take one sideband
+ssb(shift, x) = freqshift(x, shift) : _ , !; // only take one sideband
