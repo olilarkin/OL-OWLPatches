@@ -2,7 +2,7 @@
 // name: "Blipper"
 // author: "Oli Larkin (contact@olilarkin.co.uk)"
 // copyright: "Oliver Larkin"
-// version: "0.1"
+// version: "0.2"
 //
 // Code generated with Faust 0.9.70 (http://faust.grame.fr)
 //-----------------------------------------------------
@@ -346,33 +346,34 @@ class Blipper : public dsp {
 	int 	iConst0;
 	float 	fConst1;
 	float 	fConst2;
+	FAUSTFLOAT 	fslider0;
+	float 	fRec0[2];
 	float 	fConst3;
 	float 	fConst4;
-	FAUSTFLOAT 	fslider0;
-	FAUSTFLOAT 	fslider1;
-	float 	fRec1[2];
-	float 	fRec0[2];
 	float 	fConst5;
 	float 	fConst6;
-	FAUSTFLOAT 	fslider2;
-	float 	fRec4[2];
+	FAUSTFLOAT 	fslider1;
+	float 	fRec2[2];
+	float 	fRec1[2];
 	float 	fConst7;
 	float 	fConst8;
-	FAUSTFLOAT 	fslider3;
+	FAUSTFLOAT 	fslider2;
 	float 	fRec5[2];
-	float 	fRec3[2];
+	FAUSTFLOAT 	fslider3;
+	float 	fRec6[2];
+	float 	fRec4[2];
 	float 	fVec1[2];
 	int 	IOTA;
 	float 	fVec2[4096];
 	float 	fConst9;
-	float 	fRec2[2];
+	float 	fRec3[2];
   public:
 	static void metadata(Meta* m) 	{ 
 		m->declare("name", "Blipper");
 		m->declare("description", "Envelope Follower controlling pitch of a triangle oscillator, good with percussive input");
 		m->declare("author", "Oli Larkin (contact@olilarkin.co.uk)");
 		m->declare("copyright", "Oliver Larkin");
-		m->declare("version", "0.1");
+		m->declare("version", "0.2");
 		m->declare("licence", "GPL");
 		m->declare("music.lib/name", "Music Library");
 		m->declare("music.lib/author", "GRAME");
@@ -415,28 +416,29 @@ class Blipper : public dsp {
 		fSamplingFreq = samplingFreq;
 		for (int i=0; i<2; i++) iVec0[i] = 0;
 		iConst0 = min(192000, max(1, fSamplingFreq));
-		fConst1 = (1.76e+03f / float(iConst0));
-		fConst2 = (1.0f / float(iConst0));
-		fConst3 = float(iConst0);
-		fConst4 = (1.0f / fConst3);
-		fslider0 = 2.0f;
-		fslider1 = 2e+01f;
-		for (int i=0; i<2; i++) fRec1[i] = 0;
+		fConst1 = expf((0 - (2e+02f / float(iConst0))));
+		fConst2 = (1.0f - fConst1);
+		fslider0 = 0.5f;
 		for (int i=0; i<2; i++) fRec0[i] = 0;
-		fConst5 = expf((0 - (1e+02f / float(iConst0))));
-		fConst6 = (1.0f - fConst5);
-		fslider2 = 6e+01f;
-		for (int i=0; i<2; i++) fRec4[i] = 0;
-		fConst7 = expf((0 - (2e+02f / float(iConst0))));
+		fConst3 = (1.76e+03f / float(iConst0));
+		fConst4 = (1.0f / float(iConst0));
+		fConst5 = float(iConst0);
+		fConst6 = (1.0f / fConst5);
+		fslider1 = 2e+01f;
+		for (int i=0; i<2; i++) fRec2[i] = 0;
+		for (int i=0; i<2; i++) fRec1[i] = 0;
+		fConst7 = expf((0 - (1e+02f / float(iConst0))));
 		fConst8 = (1.0f - fConst7);
-		fslider3 = 24.0f;
+		fslider2 = 6e+01f;
 		for (int i=0; i<2; i++) fRec5[i] = 0;
-		for (int i=0; i<2; i++) fRec3[i] = 0;
+		fslider3 = 24.0f;
+		for (int i=0; i<2; i++) fRec6[i] = 0;
+		for (int i=0; i<2; i++) fRec4[i] = 0;
 		for (int i=0; i<2; i++) fVec1[i] = 0;
 		IOTA = 0;
 		for (int i=0; i<4096; i++) fVec2[i] = 0;
-		fConst9 = (0.5f * fConst3);
-		for (int i=0; i<2; i++) fRec2[i] = 0;
+		fConst9 = (0.5f * fConst5);
+		for (int i=0; i<2; i++) fRec3[i] = 0;
 	}
 	virtual void init(int samplingFreq) {
 		classInit(samplingFreq);
@@ -444,27 +446,25 @@ class Blipper : public dsp {
 	}
 	virtual void buildUserInterface(UI* interface) {
 		interface->openVerticalBox("0x00");
-		interface->declare(&fslider0, "OWL", "PARAMETER_C");
-		interface->declare(&fslider0, "unit", "ms");
-		interface->addHorizontalSlider("Attack", &fslider0, 2.0f, 2.0f, 1e+03f, 1.0f);
 		interface->declare(&fslider2, "OWL", "PARAMETER_A");
 		interface->declare(&fslider2, "unit", "semitones");
 		interface->addHorizontalSlider("BasePitch", &fslider2, 6e+01f, 24.0f, 96.0f, 0.1f);
+		interface->declare(&fslider0, "OWL", "PARAMETER_D");
+		interface->addHorizontalSlider("Mix", &fslider0, 0.5f, 0.0f, 1.0f, 0.01f);
 		interface->declare(&fslider3, "OWL", "PARAMETER_B");
 		interface->declare(&fslider3, "unit", "semitones");
 		interface->addHorizontalSlider("PitchMod", &fslider3, 24.0f, -64.0f, 64.0f, 1.0f);
-		interface->declare(&fslider1, "OWL", "PARAMETER_D");
+		interface->declare(&fslider1, "OWL", "PARAMETER_C");
 		interface->declare(&fslider1, "unit", "ms");
-		interface->addHorizontalSlider("Release", &fslider1, 2e+01f, 2.0f, 1e+03f, 1.0f);
+		interface->addHorizontalSlider("Release", &fslider1, 2e+01f, 2.0f, 1e+02f, 1.0f);
 		interface->closeBox();
 	}
 	virtual void compute (int count, FAUSTFLOAT** input, FAUSTFLOAT** output) {
-		float 	fSlow0 = expf((0 - (fConst2 / max(fConst4, (0.001f * float(fslider0))))));
-		float 	fSlow1 = (1.0f - fSlow0);
-		float 	fSlow2 = expf((0 - (fConst2 / max(fConst4, (0.001f * float(fslider1))))));
-		float 	fSlow3 = (1.0f - fSlow2);
-		float 	fSlow4 = (fConst6 * float(fslider2));
-		float 	fSlow5 = (fConst8 * float(fslider3));
+		float 	fSlow0 = (fConst2 * float(fslider0));
+		float 	fSlow1 = expf((0 - (fConst4 / max(fConst6, (0.001f * float(fslider1))))));
+		float 	fSlow2 = (1.0f - fSlow1);
+		float 	fSlow3 = (fConst8 * float(fslider2));
+		float 	fSlow4 = (fConst2 * float(fslider3));
 		FAUSTFLOAT* input0 = input[0];
 		FAUSTFLOAT* input1 = input[1];
 		FAUSTFLOAT* output0 = output[0];
@@ -473,35 +473,38 @@ class Blipper : public dsp {
 			float fTemp0 = (float)input0[i];
 			float fTemp1 = (float)input1[i];
 			iVec0[0] = 1;
-			float fTemp2 = fabsf((fTemp0 + fTemp1));
-			fRec1[0] = ((fSlow2 * max(fTemp2, fRec1[1])) + (fSlow3 * fTemp2));
-			fRec0[0] = ((fSlow0 * fRec0[1]) + (fSlow1 * fRec1[0]));
-			fRec4[0] = ((fConst5 * fRec4[1]) + fSlow4);
-			fRec5[0] = ((fConst7 * fRec5[1]) + fSlow5);
-			float fTemp3 = powf(2.0f,(0.08333333333333333f * ((fRec4[0] + (fRec5[0] * fRec0[0])) - 69.0f)));
-			float fTemp4 = max((4.4e+02f * fTemp3), 23.44894968246214f);
-			float fTemp5 = float(fTemp4);
-			fRec3[0] = fmodf((fRec3[1] + (fConst4 * fTemp5)),1);
-			float fTemp6 = faustpower<2>(((2 * fRec3[0]) - 1));
-			fVec1[0] = fTemp6;
-			float fTemp7 = ((iVec0[1] * (fVec1[0] - fVec1[1])) / fTemp5);
-			fVec2[IOTA&4095] = fTemp7;
-			float fTemp8 = max((float)0, min((float)2047, (fConst9 / fTemp4)));
-			int iTemp9 = int(fTemp8);
-			int iTemp10 = (1 + iTemp9);
-			fRec2[0] = ((0.999f * fRec2[1]) + (fConst3 * (((0.25f * fVec2[IOTA&4095]) - (0.25f * (fVec2[(IOTA-iTemp9)&4095] * (iTemp10 - fTemp8)))) - (0.25f * ((fTemp8 - iTemp9) * fVec2[(IOTA-int(iTemp10))&4095])))));
-			float fTemp11 = (fConst1 * ((fRec0[0] * fRec2[0]) * fTemp3));
-			output0[i] = (FAUSTFLOAT)fTemp11;
-			output1[i] = (FAUSTFLOAT)fTemp11;
+			fRec0[0] = ((fConst1 * fRec0[1]) + fSlow0);
+			float fTemp2 = (1 - fRec0[0]);
+			float fTemp3 = fabsf((fTemp0 + fTemp1));
+			fRec2[0] = ((fSlow1 * max(fTemp3, fRec2[1])) + (fSlow2 * fTemp3));
+			fRec1[0] = ((fConst1 * fRec1[1]) + (fConst2 * fRec2[0]));
+			fRec5[0] = ((fConst7 * fRec5[1]) + fSlow3);
+			fRec6[0] = ((fConst1 * fRec6[1]) + fSlow4);
+			float fTemp4 = powf(2.0f,(0.08333333333333333f * ((fRec5[0] + (fRec6[0] * fRec1[0])) - 69.0f)));
+			float fTemp5 = max((4.4e+02f * fTemp4), 23.44894968246214f);
+			float fTemp6 = float(fTemp5);
+			fRec4[0] = fmodf((fRec4[1] + (fConst6 * fTemp6)),1);
+			float fTemp7 = faustpower<2>(((2 * fRec4[0]) - 1));
+			fVec1[0] = fTemp7;
+			float fTemp8 = ((iVec0[1] * (fVec1[0] - fVec1[1])) / fTemp6);
+			fVec2[IOTA&4095] = fTemp8;
+			float fTemp9 = max((float)0, min((float)2047, (fConst9 / fTemp5)));
+			int iTemp10 = int(fTemp9);
+			int iTemp11 = (1 + iTemp10);
+			fRec3[0] = ((0.999f * fRec3[1]) + (fConst5 * (((0.25f * fVec2[IOTA&4095]) - (0.25f * (fVec2[(IOTA-iTemp10)&4095] * (iTemp11 - fTemp9)))) - (0.25f * ((fTemp9 - iTemp10) * fVec2[(IOTA-int(iTemp11))&4095])))));
+			float fTemp12 = (fConst3 * (((fRec0[0] * fRec1[0]) * fRec3[0]) * fTemp4));
+			output0[i] = (FAUSTFLOAT)((fTemp0 * fTemp2) + fTemp12);
+			output1[i] = (FAUSTFLOAT)((fTemp1 * fTemp2) + fTemp12);
 			// post processing
-			fRec2[1] = fRec2[0];
+			fRec3[1] = fRec3[0];
 			IOTA = IOTA+1;
 			fVec1[1] = fVec1[0];
-			fRec3[1] = fRec3[0];
-			fRec5[1] = fRec5[0];
 			fRec4[1] = fRec4[0];
-			fRec0[1] = fRec0[0];
+			fRec6[1] = fRec6[0];
+			fRec5[1] = fRec5[0];
 			fRec1[1] = fRec1[0];
+			fRec2[1] = fRec2[0];
+			fRec0[1] = fRec0[0];
 			iVec0[1] = iVec0[0];
 		}
 	}

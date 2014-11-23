@@ -351,6 +351,10 @@ class StereoFreqShifter : public dsp {
 	FAUSTFLOAT 	fslider3;
 	float 	fRec7[2];
 	float 	fRec8[2];
+	float 	fRec10[3];
+	float 	fRec9[3];
+	float 	fRec12[3];
+	float 	fRec11[3];
   public:
 	static void metadata(Meta* m) 	{ 
 		m->declare("name", "Dual Frequency Shifter");
@@ -416,6 +420,10 @@ class StereoFreqShifter : public dsp {
 		fslider3 = 0.0f;
 		for (int i=0; i<2; i++) fRec7[i] = 0;
 		for (int i=0; i<2; i++) fRec8[i] = 0;
+		for (int i=0; i<3; i++) fRec10[i] = 0;
+		for (int i=0; i<3; i++) fRec9[i] = 0;
+		for (int i=0; i<3; i++) fRec12[i] = 0;
+		for (int i=0; i<3; i++) fRec11[i] = 0;
 	}
 	virtual void init(int samplingFreq) {
 		classInit(samplingFreq);
@@ -461,17 +469,27 @@ class StereoFreqShifter : public dsp {
 			fRec4[0] = ((fTemp0 + (0.260502f * fRec4[2])) - fTemp3);
 			float fTemp4 = (1.8685f * fRec3[1]);
 			fRec3[0] = ((fRec4[2] + (fTemp4 + fTemp3)) - ((0.870686f * fRec3[2]) + (0.260502f * fRec4[0])));
-			float fTemp5 = (((0.870686f * fRec3[0]) + fRec3[2]) - fTemp4);
-			float fTemp6 = (1.94632f * fRec6[1]);
-			fRec6[0] = ((fTemp1 + fTemp6) - (0.94657f * fRec6[2]));
-			float fTemp7 = (0.83774f * fRec5[1]);
-			fRec5[0] = ((fRec6[2] + ((0.94657f * fRec6[0]) + fTemp7)) - ((0.06338f * fRec5[2]) + fTemp6));
-			float fTemp8 = (((0.06338f * fRec5[0]) + fRec5[2]) - fTemp7);
-			output0[i] = (FAUSTFLOAT)((fTemp0 * fTemp2) + (fRec0[0] * ((fRec2[0] * fTemp5) - (fRec1[0] * fTemp8))));
+			float fTemp5 = (1.94632f * fRec6[1]);
+			fRec6[0] = ((fTemp0 + fTemp5) - (0.94657f * fRec6[2]));
+			float fTemp6 = (0.83774f * fRec5[1]);
+			fRec5[0] = ((fRec6[2] + ((0.94657f * fRec6[0]) + fTemp6)) - ((0.06338f * fRec5[2]) + fTemp5));
+			output0[i] = (FAUSTFLOAT)((fTemp0 * fTemp2) + (fRec0[0] * ((fRec2[0] * (((0.870686f * fRec3[0]) + fRec3[2]) - fTemp4)) - (fRec1[0] * (((0.06338f * fRec5[0]) + fRec5[2]) - fTemp6)))));
 			fRec7[0] = ((fSlow7 * fRec8[1]) + (fSlow8 * fRec7[1]));
 			fRec8[0] = ((1 + ((fSlow8 * fRec8[1]) + (fSlow9 * fRec7[1]))) - iVec0[1]);
-			output1[i] = (FAUSTFLOAT)((fTemp1 * fTemp2) + (fRec0[0] * ((fRec8[0] * fTemp5) - (fRec7[0] * fTemp8))));
+			float fTemp7 = (0.02569f * fRec10[1]);
+			fRec10[0] = ((fTemp1 + (0.260502f * fRec10[2])) - fTemp7);
+			float fTemp8 = (1.8685f * fRec9[1]);
+			fRec9[0] = ((fRec10[2] + (fTemp8 + fTemp7)) - ((0.870686f * fRec9[2]) + (0.260502f * fRec10[0])));
+			float fTemp9 = (1.94632f * fRec12[1]);
+			fRec12[0] = ((fTemp1 + fTemp9) - (0.94657f * fRec12[2]));
+			float fTemp10 = (0.83774f * fRec11[1]);
+			fRec11[0] = ((fRec12[2] + ((0.94657f * fRec12[0]) + fTemp10)) - ((0.06338f * fRec11[2]) + fTemp9));
+			output1[i] = (FAUSTFLOAT)((fTemp1 * fTemp2) + (fRec0[0] * ((fRec8[0] * (((0.870686f * fRec9[0]) + fRec9[2]) - fTemp8)) - (fRec7[0] * (((0.06338f * fRec11[0]) + fRec11[2]) - fTemp10)))));
 			// post processing
+			fRec11[2] = fRec11[1]; fRec11[1] = fRec11[0];
+			fRec12[2] = fRec12[1]; fRec12[1] = fRec12[0];
+			fRec9[2] = fRec9[1]; fRec9[1] = fRec9[0];
+			fRec10[2] = fRec10[1]; fRec10[1] = fRec10[0];
 			fRec8[1] = fRec8[0];
 			fRec7[1] = fRec7[0];
 			fRec5[2] = fRec5[1]; fRec5[1] = fRec5[0];
