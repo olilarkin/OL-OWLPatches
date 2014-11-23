@@ -11,8 +11,8 @@ import("effect.lib");
 
 basepitch = hslider("BasePitch [unit:semitones] [OWL:PARAMETER_A]", 60, 24, 96, 0.1) : smooth(tau2pole(0.01));
 pitchmod = hslider("PitchMod [unit:semitones] [OWL:PARAMETER_B]", 24, -64, 64, 1) : smooth(tau2pole(0.005));
-attack = hslider("Attack [unit:ms] [OWL:PARAMETER_C]", 1, 0, 1000, 1) : *(0.001) : max(1.0/float(SR));
-release = hslider("Release [unit:ms] [OWL:PARAMETER_D]", 20, 0, 1000, 1) : *(0.001) : max(1.0/float(SR));
+attack = hslider("Attack [unit:ms] [OWL:PARAMETER_C]", 2, 2, 1000, 1) : *(0.001) : max(1.0/float(SR));
+release = hslider("Release [unit:ms] [OWL:PARAMETER_D]", 20, 2, 1000, 1) : *(0.001) : max(1.0/float(SR));
 
 process = + : pc2 <: _,_
 with {
