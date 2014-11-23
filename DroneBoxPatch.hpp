@@ -1,5 +1,5 @@
-#ifndef __DroneBoxS_hpp__
-#define __DroneBoxS_hpp__
+#ifndef __DroneBox_hpp__
+#define __DroneBox_hpp__
 
 #include "StompBox.h"
 
@@ -55,7 +55,7 @@
 #define DB_CLIP(a,lo, hi) ( (a)>(lo)?( (a)<(hi)?(a):(hi) ):(lo) )
 
 
-class DroneBoxSPatch : public Patch
+class DroneBoxPatch : public Patch
 {
 private:
   static const unsigned int BUF_SIZE;
@@ -261,7 +261,7 @@ private:
   }
   
 public:
-  DroneBoxSPatch()
+  DroneBoxPatch()
   : mRamp(0.1)
   , mPrevCoarsePitch(-1.)
   , mPrevFinePitch(-1.)
@@ -332,18 +332,18 @@ public:
   }  
 };
 
-const unsigned int DroneBoxSPatch::BUF_SIZE = 1024; // = 4096 bytes per comb
-const unsigned int DroneBoxSPatch::BUF_MASK = 1023;
-const float DroneBoxSPatch::MAX_FBK = 0.999999f;
-const float DroneBoxSPatch::MIN_DT_SAMPLES = 2.5f;
-const int DroneBoxSPatch::NUM_COMBS = 4;
-const float DroneBoxSPatch::MIN_PITCH = 36.f; // MIDI notenumber
-const float DroneBoxSPatch::MAX_PITCH = 60.f; // MIDI notenumber
-const float DroneBoxSPatch::PITCH_RANGE = MAX_PITCH - MIN_PITCH; // semitones
-const float DroneBoxSPatch::MIN_DECAY = 200.f; // milliseconds
-const float DroneBoxSPatch::MAX_DECAY = 30000.f; // milliseconds
-const float DroneBoxSPatch::DECAY_RANGE = MAX_DECAY - MIN_DECAY;
-const float DroneBoxSPatch::FREQ_RATIOS[NUM_COMBS] = {1.f, 1.5f, 2.f, 3.f}; 
-//const float DroneBoxSPatch::FREQ_RATIOS[NUM_COMBS] = {1., 1.01, 1.02, 1.03}; 
+const unsigned int DroneBoxPatch::BUF_SIZE = 1024; // = 4096 bytes per comb
+const unsigned int DroneBoxPatch::BUF_MASK = 1023;
+const float DroneBoxPatch::MAX_FBK = 0.999999f;
+const float DroneBoxPatch::MIN_DT_SAMPLES = 2.5f;
+const int DroneBoxPatch::NUM_COMBS = 4;
+const float DroneBoxPatch::MIN_PITCH = 36.f; // MIDI notenumber
+const float DroneBoxPatch::MAX_PITCH = 60.f; // MIDI notenumber
+const float DroneBoxPatch::PITCH_RANGE = MAX_PITCH - MIN_PITCH; // semitones
+const float DroneBoxPatch::MIN_DECAY = 200.f; // milliseconds
+const float DroneBoxPatch::MAX_DECAY = 30000.f; // milliseconds
+const float DroneBoxPatch::DECAY_RANGE = MAX_DECAY - MIN_DECAY;
+const float DroneBoxPatch::FREQ_RATIOS[NUM_COMBS] = {1.f, 1.5f, 2.f, 3.f}; 
+//const float DroneBoxPatch::FREQ_RATIOS[NUM_COMBS] = {1., 1.01, 1.02, 1.03}; 
 
 #endif // __DroneBox_hpp__
