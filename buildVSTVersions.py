@@ -3,9 +3,12 @@ import subprocess, glob, shutil, os.path
 vstdir = "/Library/Audio/Plug-Ins/VST/MyFaust"
 
 faustFiles = glob.glob("*.dsp")
+faustFiles = glob.glob("*.dsp")
+
+faustFiles.remove("IIRHilbert.dsp")
+faustFiles.remove("FrequencyShifter.dsp")
 
 for file in faustFiles:
-  if(file != "IIRHilbert.dsp" || file != "FrequencyShifter.dsp"):
     command = ["faust2vst", file]
     subprocess.call(command)
     
