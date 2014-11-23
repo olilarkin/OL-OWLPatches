@@ -62,6 +62,8 @@ Thru Zero Flanger is a stereo flanger, that can completely cancel left and right
 ##Dual Pitch Shifter
 Dual Pitch Shifter is a dual channel pitch shifter, based on Faust’s pitch_shifter.dsp by Grame. Pitch shifting is (intentionally) extremely basic and introduces significant delay based on window size.
 
+NOTE: Parameters A and B are bi-polar controls so put them in the middle to set the pitch shift to 0 semitones.
+
 ###Parameters:
 * A) Left shift (semitones) -- Range -12 to +12
 * B) Right shift (semitones) -- Range -12 to +12
