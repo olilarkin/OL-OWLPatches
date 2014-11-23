@@ -10,8 +10,8 @@ import("filter.lib");
 
 import("FrequencyShifter.dsp");
 
-shiftL = hslider("Shift L [unit:hz] [OWL:PARAMETER_A]", 0.0, -1., 1, 0.001);
-shiftR = hslider("Shift R [unit:hz] [OWL:PARAMETER_B", 0.0, -1., 1, 0.001);
+shiftL = hslider("Shift L [unit:hz] [OWL:PARAMETER_A]", 0., -1., 1, 0.001);
+shiftR = hslider("Shift R [unit:hz] [OWL:PARAMETER_B]", 0., -1., 1, 0.001);
 shiftScalar = hslider("Shift Scalar [OWL:PARAMETER_C]", 1., 1., 100, 0.1);
 mix = hslider("Mix [OWL:PARAMETER_D]",0.5,0,1,0.01) : smooth(tau2pole(0.005));
 

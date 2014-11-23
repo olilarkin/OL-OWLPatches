@@ -428,6 +428,7 @@ class DualFreqShifter : public dsp {
 		interface->declare(&fslider1, "OWL", "PARAMETER_A");
 		interface->declare(&fslider1, "unit", "hz");
 		interface->addHorizontalSlider("Shift L", &fslider1, 0.0f, -1.0f, 1.0f, 0.001f);
+		interface->declare(&fslider3, "OWL", "PARAMETER_B");
 		interface->declare(&fslider3, "unit", "hz");
 		interface->addHorizontalSlider("Shift R", &fslider3, 0.0f, -1.0f, 1.0f, 0.001f);
 		interface->declare(&fslider2, "OWL", "PARAMETER_C");
