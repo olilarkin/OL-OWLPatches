@@ -336,20 +336,20 @@ class WeirdPhaser : public dsp {
 	class SIG0 {
 	  private:
 		int 	fSamplingFreq;
-		int 	iRec3[2];
+		int 	iRec4[2];
 	  public:
 		int getNumInputs() 	{ return 0; }
 		int getNumOutputs() 	{ return 1; }
 		void init(int samplingFreq) {
 			fSamplingFreq = samplingFreq;
-			for (int i=0; i<2; i++) iRec3[i] = 0;
+			for (int i=0; i<2; i++) iRec4[i] = 0;
 		}
 		void fill (int count, float output[]) {
 			for (int i=0; i<count; i++) {
-				iRec3[0] = (1 + iRec3[1]);
-				output[i] = sinf((0.01227184630308513f * float((iRec3[0] - 1))));
+				iRec4[0] = (1 + iRec4[1]);
+				output[i] = sinf((0.01227184630308513f * float((iRec4[0] - 1))));
 				// post processing
-				iRec3[1] = iRec3[0];
+				iRec4[1] = iRec4[0];
 			}
 		}
 	};
@@ -359,21 +359,23 @@ class WeirdPhaser : public dsp {
 	float 	fConst1;
 	float 	fConst2;
 	FAUSTFLOAT 	fslider0;
-	float 	fRec0[2];
+	float 	fRec3[2];
 	float 	fRec2[3];
 	float 	fRec1[3];
 	static float 	ftbl0[513];
 	float 	fConst3;
 	FAUSTFLOAT 	fslider1;
 	FAUSTFLOAT 	fslider2;
-	float 	fRec4[2];
-	float 	fRec6[3];
-	float 	fRec5[3];
-	float 	fRec8[3];
+	float 	fRec5[2];
 	float 	fRec7[3];
-	FAUSTFLOAT 	fslider3;
+	float 	fRec6[3];
+	float 	fRec0[2];
 	float 	fRec10[3];
 	float 	fRec9[3];
+	FAUSTFLOAT 	fslider3;
+	float 	fRec12[3];
+	float 	fRec11[3];
+	float 	fRec8[2];
   public:
 	static void metadata(Meta* m) 	{ 
 		m->declare("name", "Weird Phaser");
@@ -387,17 +389,22 @@ class WeirdPhaser : public dsp {
 		m->declare("math.lib/copyright", "GRAME");
 		m->declare("math.lib/version", "1.0");
 		m->declare("math.lib/license", "LGPL with exception");
+		m->declare("maxmsp.lib/name", "MaxMSP compatibility Library");
+		m->declare("maxmsp.lib/author", "GRAME");
+		m->declare("maxmsp.lib/copyright", "GRAME");
+		m->declare("maxmsp.lib/version", "1.1");
+		m->declare("maxmsp.lib/license", "LGPL");
+		m->declare("music.lib/name", "Music Library");
+		m->declare("music.lib/author", "GRAME");
+		m->declare("music.lib/copyright", "GRAME");
+		m->declare("music.lib/version", "1.0");
+		m->declare("music.lib/license", "LGPL with exception");
 		m->declare("filter.lib/name", "Faust Filter Library");
 		m->declare("filter.lib/author", "Julius O. Smith (jos at ccrma.stanford.edu)");
 		m->declare("filter.lib/copyright", "Julius O. Smith III");
 		m->declare("filter.lib/version", "1.29");
 		m->declare("filter.lib/license", "STK-4.3");
 		m->declare("filter.lib/reference", "https://ccrma.stanford.edu/~jos/filters/");
-		m->declare("music.lib/name", "Music Library");
-		m->declare("music.lib/author", "GRAME");
-		m->declare("music.lib/copyright", "GRAME");
-		m->declare("music.lib/version", "1.0");
-		m->declare("music.lib/license", "LGPL with exception");
 	}
 
 	virtual int getNumInputs() 	{ return 2; }
@@ -412,21 +419,23 @@ class WeirdPhaser : public dsp {
 		iConst0 = min(192000, max(1, fSamplingFreq));
 		fConst1 = expf((0 - (2e+02f / float(iConst0))));
 		fConst2 = (1.0f - fConst1);
-		fslider0 = 0.5f;
-		for (int i=0; i<2; i++) fRec0[i] = 0;
+		fslider0 = 0.0f;
+		for (int i=0; i<2; i++) fRec3[i] = 0;
 		for (int i=0; i<3; i++) fRec2[i] = 0;
 		for (int i=0; i<3; i++) fRec1[i] = 0;
 		fConst3 = (1.0f / float(iConst0));
 		fslider1 = 0.0f;
 		fslider2 = 1.0f;
-		for (int i=0; i<2; i++) fRec4[i] = 0;
-		for (int i=0; i<3; i++) fRec6[i] = 0;
-		for (int i=0; i<3; i++) fRec5[i] = 0;
-		for (int i=0; i<3; i++) fRec8[i] = 0;
+		for (int i=0; i<2; i++) fRec5[i] = 0;
 		for (int i=0; i<3; i++) fRec7[i] = 0;
-		fslider3 = 0.0f;
+		for (int i=0; i<3; i++) fRec6[i] = 0;
+		for (int i=0; i<2; i++) fRec0[i] = 0;
 		for (int i=0; i<3; i++) fRec10[i] = 0;
 		for (int i=0; i<3; i++) fRec9[i] = 0;
+		fslider3 = 0.0f;
+		for (int i=0; i<3; i++) fRec12[i] = 0;
+		for (int i=0; i<3; i++) fRec11[i] = 0;
+		for (int i=0; i<2; i++) fRec8[i] = 0;
 	}
 	virtual void init(int samplingFreq) {
 		classInit(samplingFreq);
@@ -434,10 +443,10 @@ class WeirdPhaser : public dsp {
 	}
 	virtual void buildUserInterface(UI* interface) {
 		interface->openVerticalBox("0x00");
+		interface->declare(&fslider0, "OWL", "PARAMETER_D");
+		interface->addHorizontalSlider("Fbk", &fslider0, 0.0f, 0.0f, 0.7f, 0.01f);
 		interface->declare(&fslider3, "OWL", "PARAMETER_C");
 		interface->addHorizontalSlider("L-R Offset", &fslider3, 0.0f, 0.0f, 1.0f, 0.001f);
-		interface->declare(&fslider0, "OWL", "PARAMETER_D");
-		interface->addHorizontalSlider("Mix", &fslider0, 0.5f, 0.0f, 1.0f, 0.01f);
 		interface->declare(&fslider2, "OWL", "PARAMETER_B");
 		interface->addHorizontalSlider("Rate Scalar", &fslider2, 1.0f, 1.0f, 1e+02f, 0.001f);
 		interface->declare(&fslider1, "OWL", "PARAMETER_A");
@@ -456,51 +465,56 @@ class WeirdPhaser : public dsp {
 		for (int i=0; i<count; i++) {
 			float fTemp0 = (float)input0[i];
 			float fTemp1 = (float)input1[i];
-			fRec0[0] = ((fConst1 * fRec0[1]) + fSlow0);
-			float fTemp2 = (1 - fRec0[0]);
+			fRec3[0] = ((fConst1 * fRec3[1]) + fSlow0);
+			float fTemp2 = max((float)-1, min((float)1, (fRec3[0] * fRec0[1])));
 			float fTemp3 = (0.02569f * fRec2[1]);
-			fRec2[0] = ((fTemp0 + (0.260502f * fRec2[2])) - fTemp3);
+			fRec2[0] = ((fTemp2 + (fTemp0 + (0.260502f * fRec2[2]))) - fTemp3);
 			float fTemp4 = (1.8685f * fRec1[1]);
 			fRec1[0] = ((fRec2[2] + (fTemp4 + fTemp3)) - ((0.870686f * fRec1[2]) + (0.260502f * fRec2[0])));
-			float fTemp5 = (fSlow1 + fRec4[1]);
-			fRec4[0] = (fTemp5 - floorf(fTemp5));
-			float fTemp6 = (512 * fmodf(fRec4[0],1.0f));
+			float fTemp5 = (fSlow1 + fRec5[1]);
+			fRec5[0] = (fTemp5 - floorf(fTemp5));
+			float fTemp6 = (512 * fmodf(fRec5[0],1.0f));
 			int iTemp7 = int(fmodf((fTemp6 + 128.0f),512));
 			float fTemp8 = ftbl0[iTemp7];
 			float fTemp9 = (fTemp6 - floorf(fTemp6));
-			float fTemp10 = (1.94632f * fRec6[1]);
-			fRec6[0] = ((fTemp0 + fTemp10) - (0.94657f * fRec6[2]));
-			float fTemp11 = (0.83774f * fRec5[1]);
-			fRec5[0] = ((fRec6[2] + ((0.94657f * fRec6[0]) + fTemp11)) - ((0.06338f * fRec5[2]) + fTemp10));
+			float fTemp10 = (1.94632f * fRec7[1]);
+			fRec7[0] = (((fTemp0 + fTemp2) + fTemp10) - (0.94657f * fRec7[2]));
+			float fTemp11 = (0.83774f * fRec6[1]);
+			fRec6[0] = ((fRec7[2] + ((0.94657f * fRec7[0]) + fTemp11)) - ((0.06338f * fRec6[2]) + fTemp10));
 			int iTemp12 = int(fTemp6);
 			float fTemp13 = ftbl0[iTemp12];
-			output0[i] = (FAUSTFLOAT)((fTemp0 * fTemp2) + (fRec0[0] * (((((0.870686f * fRec1[0]) + fRec1[2]) - fTemp4) * (fTemp8 + (fTemp9 * (ftbl0[(1 + iTemp7)] - fTemp8)))) - ((((0.06338f * fRec5[0]) + fRec5[2]) - fTemp11) * (fTemp13 + (fTemp9 * (ftbl0[(1 + iTemp12)] - fTemp13)))))));
-			float fTemp14 = (0.02569f * fRec8[1]);
-			fRec8[0] = ((fTemp1 + (0.260502f * fRec8[2])) - fTemp14);
-			float fTemp15 = (1.8685f * fRec7[1]);
-			fRec7[0] = ((fRec8[2] + (fTemp15 + fTemp14)) - ((0.870686f * fRec7[2]) + (0.260502f * fRec8[0])));
-			float fTemp16 = (512 * fmodf((fSlow2 + fRec4[0]),1.0f));
-			int iTemp17 = int(fmodf((128.0f + fTemp16),512));
-			float fTemp18 = ftbl0[iTemp17];
-			float fTemp19 = (fTemp16 - floorf(fTemp16));
-			float fTemp20 = (1.94632f * fRec10[1]);
-			fRec10[0] = ((fTemp1 + fTemp20) - (0.94657f * fRec10[2]));
-			float fTemp21 = (0.83774f * fRec9[1]);
-			fRec9[0] = ((fRec10[2] + ((0.94657f * fRec10[0]) + fTemp21)) - ((0.06338f * fRec9[2]) + fTemp20));
-			int iTemp22 = int(fTemp16);
-			float fTemp23 = ftbl0[iTemp22];
-			output1[i] = (FAUSTFLOAT)((fTemp1 * fTemp2) + (fRec0[0] * (((((0.870686f * fRec7[0]) + fRec7[2]) - fTemp15) * (fTemp18 + (fTemp19 * (ftbl0[(1 + iTemp17)] - fTemp18)))) - ((((0.06338f * fRec9[0]) + fRec9[2]) - fTemp21) * (fTemp23 + (fTemp19 * (ftbl0[(1 + iTemp22)] - fTemp23)))))));
+			fRec0[0] = (((((0.870686f * fRec1[0]) + fRec1[2]) - fTemp4) * (fTemp8 + (fTemp9 * (ftbl0[(1 + iTemp7)] - fTemp8)))) - ((((0.06338f * fRec6[0]) + fRec6[2]) - fTemp11) * (fTemp13 + (fTemp9 * (ftbl0[(1 + iTemp12)] - fTemp13)))));
+			output0[i] = (FAUSTFLOAT)(0.5f * (fTemp0 + fRec0[0]));
+			float fTemp14 = max((float)-1, min((float)1, (fRec3[0] * fRec8[1])));
+			float fTemp15 = (0.02569f * fRec10[1]);
+			fRec10[0] = ((fTemp14 + (fTemp1 + (0.260502f * fRec10[2]))) - fTemp15);
+			float fTemp16 = (1.8685f * fRec9[1]);
+			fRec9[0] = ((fRec10[2] + (fTemp16 + fTemp15)) - ((0.870686f * fRec9[2]) + (0.260502f * fRec10[0])));
+			float fTemp17 = (512 * fmodf((fSlow2 + fRec5[0]),1.0f));
+			int iTemp18 = int(fmodf((128.0f + fTemp17),512));
+			float fTemp19 = ftbl0[iTemp18];
+			float fTemp20 = (fTemp17 - floorf(fTemp17));
+			float fTemp21 = (1.94632f * fRec12[1]);
+			fRec12[0] = (((fTemp1 + fTemp14) + fTemp21) - (0.94657f * fRec12[2]));
+			float fTemp22 = (0.83774f * fRec11[1]);
+			fRec11[0] = ((fRec12[2] + ((0.94657f * fRec12[0]) + fTemp22)) - ((0.06338f * fRec11[2]) + fTemp21));
+			int iTemp23 = int(fTemp17);
+			float fTemp24 = ftbl0[iTemp23];
+			fRec8[0] = (((((0.870686f * fRec9[0]) + fRec9[2]) - fTemp16) * (fTemp19 + (fTemp20 * (ftbl0[(1 + iTemp18)] - fTemp19)))) - ((((0.06338f * fRec11[0]) + fRec11[2]) - fTemp22) * (fTemp24 + (fTemp20 * (ftbl0[(1 + iTemp23)] - fTemp24)))));
+			output1[i] = (FAUSTFLOAT)(0.5f * (fTemp1 + fRec8[0]));
 			// post processing
+			fRec8[1] = fRec8[0];
+			fRec11[2] = fRec11[1]; fRec11[1] = fRec11[0];
+			fRec12[2] = fRec12[1]; fRec12[1] = fRec12[0];
 			fRec9[2] = fRec9[1]; fRec9[1] = fRec9[0];
 			fRec10[2] = fRec10[1]; fRec10[1] = fRec10[0];
-			fRec7[2] = fRec7[1]; fRec7[1] = fRec7[0];
-			fRec8[2] = fRec8[1]; fRec8[1] = fRec8[0];
-			fRec5[2] = fRec5[1]; fRec5[1] = fRec5[0];
+			fRec0[1] = fRec0[0];
 			fRec6[2] = fRec6[1]; fRec6[1] = fRec6[0];
-			fRec4[1] = fRec4[0];
+			fRec7[2] = fRec7[1]; fRec7[1] = fRec7[0];
+			fRec5[1] = fRec5[0];
 			fRec1[2] = fRec1[1]; fRec1[1] = fRec1[0];
 			fRec2[2] = fRec2[1]; fRec2[1] = fRec2[0];
-			fRec0[1] = fRec0[0];
+			fRec3[1] = fRec3[0];
 		}
 	}
 };
