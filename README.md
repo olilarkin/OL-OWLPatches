@@ -83,7 +83,7 @@ NOTE: Parameter C (Pitch mod depth) is a bi-polar control so put it in the middl
 * C) Release time (ms) -- Range 2 ms to 100 ms
 * D) Dry/Wet mix
 
-##Weird Phaser:
+##Weird Phaser
 Weird Phaser is a stereo phase shifter based on SSB (single side band) modulation. Unlike "Stereo Frequency Shifter", Weird Phaser uses a single LFO which has a fixed phase offset for the right hand channel, causing some interesting "between the ears" spatial effects at its maximum settting. Weird Phaser also has feedback for a more pronounced effect.
 
 ###Parameters:
