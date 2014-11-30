@@ -14,9 +14,9 @@ mix = 0.5;
 maxfeedback = 0.7;
 
 rate = hslider("Rate [unit:hz] [OWL:PARAMETER_A]", 0, 0., 1, 0.001);
-rateScalar = hslider("Rate Scalar [OWL:PARAMETER_B]", 1., 1., 100, 0.001);
+rateScalar = hslider("Rate Scalar [OWL:PARAMETER_B]", 1., 1., 40., 0.001);
 offset = hslider("L-R Offset [OWL:PARAMETER_C]", 0., 0., 1., 0.001) * 0.5;
-fbk = hslider("Feedback [OWL:PARAMETER_D]", 0., 0, 1., 0.01) : *(0.maxfeedback) : smooth(tau2pole(0.005));
+fbk = hslider("Feedback [OWL:PARAMETER_D]", 0., 0, 1., 0.01) : *(maxfeedback) : smooth(tau2pole(0.005));
 
 ssbfreqshift(x, offset) = (+ : negative) ~ (*(fbk) : clip(-1, 1))
 with {

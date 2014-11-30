@@ -88,7 +88,7 @@ Weird Phaser is a stereo phase shifter based on SSB (single side band) modulatio
 
 ###Parameters:
 * A) Rate (Hz) -- Range 0 to 1
-* B) Rate scalar -- Range 1 to 100
+* B) Rate scalar -- Range 1 to 40
 * C) L-R offset (phase) -- Range 0 to 1
 * D) Feedback -- Range 0 to 1
 
