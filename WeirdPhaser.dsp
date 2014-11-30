@@ -10,13 +10,13 @@ import("filter.lib");
 
 lutsize = 1 << 9;
 sintable = float(time)*(2.0*PI)/float(lutsize) : sin;
+mix = 0.5;
+maxfeedback = 0.7;
 
 rate = hslider("Rate [unit:hz] [OWL:PARAMETER_A]", 0, 0., 1, 0.001);
 rateScalar = hslider("Rate Scalar [OWL:PARAMETER_B]", 1., 1., 100, 0.001);
 offset = hslider("L-R Offset [OWL:PARAMETER_C]", 0., 0., 1., 0.001) * 0.5;
-//mix = hslider("Mix [OWL:PARAMETER_D]", 0.5, 0, 1, 0.01) : smooth(tau2pole(0.005));
-mix = 0.5;
-fbk = hslider("Fbk [OWL:PARAMETER_D]", 0., 0, 0.7, 0.01) : smooth(tau2pole(0.005));
+fbk = hslider("Feedback [OWL:PARAMETER_D]", 0., 0, 1., 0.01) : *(0.maxfeedback) : smooth(tau2pole(0.005));
 
 ssbfreqshift(x, offset) = (+ : negative) ~ (*(fbk) : clip(-1, 1))
 with {
