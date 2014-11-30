@@ -368,13 +368,14 @@ class ThruZeroFlanger : public dsp {
 	float 	fConst4;
 	FAUSTFLOAT 	fslider0;
 	float 	fRec0[2];
+	float 	fConst5;
 	FAUSTFLOAT 	fslider1;
 	float 	fRec1[2];
 	static float 	ftbl0[513];
-	float 	fConst5;
+	float 	fConst6;
 	FAUSTFLOAT 	fslider2;
 	float 	fRec3[2];
-	float 	fConst6;
+	float 	fConst7;
 	FAUSTFLOAT 	fslider3;
 	float 	fRec4[2];
   public:
@@ -432,12 +433,13 @@ class ThruZeroFlanger : public dsp {
 		fConst4 = (1.0f - fConst3);
 		fslider0 = 1e+01f;
 		for (int i=0; i<2; i++) fRec0[i] = 0;
+		fConst5 = (0.01f * fConst4);
 		fslider1 = 2e+01f;
 		for (int i=0; i<2; i++) fRec1[i] = 0;
-		fConst5 = (1.0f / fConst1);
+		fConst6 = (1.0f / fConst1);
 		fslider2 = 0.1f;
 		for (int i=0; i<2; i++) fRec3[i] = 0;
-		fConst6 = (0.5f * fConst4);
+		fConst7 = (0.5f * fConst4);
 		fslider3 = 0.0f;
 		for (int i=0; i<2; i++) fRec4[i] = 0;
 	}
@@ -452,7 +454,7 @@ class ThruZeroFlanger : public dsp {
 		interface->addHorizontalSlider("Delay", &fslider0, 1e+01f, 0.5f, 2e+01f, 0.01f);
 		interface->declare(&fslider1, "OWL", "PARAMETER_D");
 		interface->declare(&fslider1, "unit", "%");
-		interface->addHorizontalSlider("Depth", &fslider1, 2e+01f, 1.0f, 1e+02f, 1.0f);
+		interface->addHorizontalSlider("Depth", &fslider1, 2e+01f, 3.0f, 1e+02f, 1.0f);
 		interface->declare(&fslider3, "OWL", "PARAMETER_C");
 		interface->addHorizontalSlider("L-R Offset", &fslider3, 0.0f, 0.0f, 1.0f, 0.001f);
 		interface->declare(&fslider2, "OWL", "PARAMETER_A");
@@ -462,9 +464,9 @@ class ThruZeroFlanger : public dsp {
 	}
 	virtual void compute (int count, FAUSTFLOAT** input, FAUSTFLOAT** output) {
 		float 	fSlow0 = (fConst4 * float(fslider0));
-		float 	fSlow1 = (fConst4 * (0.03f + (0.01f * float(fslider1))));
-		float 	fSlow2 = (fConst5 * float(fslider2));
-		float 	fSlow3 = (fConst6 * float(fslider3));
+		float 	fSlow1 = (fConst5 * float(fslider1));
+		float 	fSlow2 = (fConst6 * float(fslider2));
+		float 	fSlow3 = (fConst7 * float(fslider3));
 		FAUSTFLOAT* input0 = input[0];
 		FAUSTFLOAT* input1 = input[1];
 		FAUSTFLOAT* output0 = output[0];

@@ -16,7 +16,7 @@ smooth_time = 0.005;
 rate = hslider("Rate [unit:hz] [OWL:PARAMETER_A]", 0.1, 0., 1, 0.001);
 dt = hslider("Delay [unit:ms] [OWL:PARAMETER_B]", 10., 0.5, maxdtms, 0.01) : smooth(tau2pole(smooth_time));
 lr_offset = hslider("L-R Offset [OWL:PARAMETER_C]", 0, 0., 1, 0.001) *(0.5) : smooth(tau2pole(smooth_time));
-depth = hslider("Depth [unit:%] [OWL:PARAMETER_D]", 20., 1., 100., 1) *(0.01) +(0.03): smooth(tau2pole(smooth_time));
+depth = hslider("Depth [unit:%] [OWL:PARAMETER_D]", 20., 3., 100., 1) *(0.01): smooth(tau2pole(smooth_time));
 
 tbllookup(phase)=s1+d*(s2-s1)
 with {
