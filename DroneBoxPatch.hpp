@@ -100,8 +100,8 @@ private:
   class DCBlocker
   {
   private:
-    float mSampleRate;
     float mInM1, mOutM1;
+    float mSampleRate;
     float mC;
   public:
     DCBlocker()
@@ -131,9 +131,9 @@ private:
     class DBLPF
     {
     private:
+      float mInM1, mInM2, mInM3;
       const float mCoeffA;
       const float mCoeffB;
-      float mInM1, mInM2, mInM3;
     
     public:
       DBLPF(float dampCoeff)
@@ -164,13 +164,13 @@ private:
     }
   
   private:
-    float mSampleRate;
-    float* mBufferL; // left input
-    float* mBufferR; // right input
     int mDTSamples;
     float mFbkScalar;
     int mWriteAddr;
+    float mSampleRate;
     DBLPF mDampingFilterL, mDampingFilterR;
+    float* mBufferL; // left input
+    float* mBufferR; // right input
   public:
     DBCombFilter()
     : mDTSamples(0)
@@ -179,6 +179,8 @@ private:
     , mSampleRate(AUDIO_SAMPLINGRATE)
     , mDampingFilterL(0.3f)
     , mDampingFilterR(0.35f)
+    , mBufferL(NULL)
+    , mBufferR(NULL)
     {
       setFreqCPS(440.f);
       setDecayTimeMs(10.f);

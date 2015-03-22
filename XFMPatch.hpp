@@ -69,11 +69,10 @@ private:
     return (x1+lo+hi-x2) * 0.5f;
   }
 
-  float mFbkA, mFbkB;
   float mFreqA, mFreqB;
-  int mMode;
-  float mX1, mX2;
-  float mY1, mY2;
+  float mFbkA, mFbkB;
+  float mX1, mY1;
+  float mX2, mY2;
   float mScale;
   
   PSmooth mFbkASmoother;
