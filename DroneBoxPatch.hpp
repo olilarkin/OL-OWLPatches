@@ -107,7 +107,7 @@ private:
     DCBlocker()
     : mInM1(0.f)
     , mOutM1(0.f)
-    , mSampleRate(AUDIO_SAMPLINGRATE)
+    , mSampleRate(48000.f)
     , mC(1.f - ( 126.f / mSampleRate))
     {
     }
@@ -176,7 +176,7 @@ private:
     : mDTSamples(0)
     , mFbkScalar(0.5f)
     , mWriteAddr(0)
-    , mSampleRate(AUDIO_SAMPLINGRATE)
+    , mSampleRate(48000.f)
     , mDampingFilterL(0.3f)
     , mDampingFilterR(0.35f)
     , mBufferL(NULL)
@@ -283,8 +283,12 @@ public:
     {
       AudioBuffer* buffer = createMemoryBuffer(2, BUF_SIZE);
       mCombs[c].setBuffer(buffer->getSamples(0), buffer->getSamples(1));
+      mCombs[c].setSampleRate(getSampleRate());
       mCombs[c].clearBuffer();
     }
+    
+    mDCBlockerL.setSampleRate(getSampleRate());
+    mDCBlockerR.setSampleRate(getSampleRate());
   }
   
   void processAudio(AudioBuffer &buffer)
