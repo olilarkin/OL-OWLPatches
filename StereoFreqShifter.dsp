@@ -1,4 +1,4 @@
-declare name "Dual Frequency Shifter";
+declare name "Stereo Frequency Shifter";
 declare description "Stereo Frequency Shifting";
 declare author "Oli Larkin (contact@olilarkin.co.uk)";
 declare copyright "Oliver Larkin";
