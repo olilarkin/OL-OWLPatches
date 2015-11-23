@@ -8,8 +8,6 @@ declare licence "GPL";
 import("IIRHilbert.dsp");
 import("filter.lib");
 
-lutsize = 1 << 9;
-sintable = float(time)*(2.0*PI)/float(lutsize) : sin;
 mix = 0.5;
 maxfeedback = 0.7;
 
@@ -24,22 +22,11 @@ with {
   positive(x) = real(x)*cosv + imag(x)*sinv;
   real(x) = hilbert(x) : _ , !;
   imag(x) = hilbert(x) : ! , _;
-  phasor = fmod(((rate*rateScalar)/float(SR) : (+ : decimal) ~ _)+offset, 1.);
-  sinv = quadlookup(phasor) : _ , !;
-  cosv = quadlookup(phasor) : ! , _;
+  phasor = fmod(((rate*rateScalar)/float(SR) : (+ : decimal) ~ _)+offset, 1.) * (2*PI);
+  sinv = sin(phasor);
+  cosv = cos(phasor);
   hilbert = hilbertef;
   clip(lo,hi) = min(hi) : max(lo);
-
-  quadlookup(phase)=ss1+d*(ss2-ss1), sc1+d*(sc2-sc1)
-	with {
-		sini = int(phase * lutsize); 
-		d = decimal(phase * lutsize);
-		cosi = int(fmod((phase * lutsize)+(lutsize*0.25), lutsize));  
-		ss1 = rdtable(lutsize+1, sintable, sini);
-		ss2 = rdtable(lutsize+1, sintable, sini+1);
-		sc1 = rdtable(lutsize+1, sintable, cosi);
-		sc2 = rdtable(lutsize+1, sintable, cosi+1);
-	};
 };
 
 process(l,r) = l,r <: *(1-mix), *(1-mix), ssbfreqshift(l, 0.)*mix, ssbfreqshift(r, offset)*mix :> _,_;
