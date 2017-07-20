@@ -20,7 +20,7 @@ DroneBox OWL is a sympathetic resonance generator: a bank of four virtual tuned 
 * D) Dry/Wet mix
 
 
-##Dual Frequency Shifter
+## Dual Frequency Shifter
 Dual Frequency Shifter is a twin frequency shifter with independent L-R control of frequency shift. Frequency shifting in small amounts can cause phasing when the dry signal is present. Parameter C is a multiplier which will allow more extreme frequency shifting effects. In order to get subtle phasing effects make sure Parameter C is turned fully left.
 
 NOTE: Parameter A and B are bi-polar controls so put it in the middle to set the frequency shift for that channel to 0.
@@ -32,7 +32,7 @@ NOTE: Parameter A and B are bi-polar controls so put it in the middle to set the
 * C) Shift scalar -- Range 1 to 100
 * D) Dry/Wet mix
 
-##Stereo Frequency Shifter
+## Stereo Frequency Shifter
 Stereo Frequency Shifter is a twin frequency shifter with linked control of frequency shift for each channel, that can be slightly offset for lush stereo phasing. In order to get subtle phasing effects make sure Parameter B is turned fully left.
 
 NOTE: Parameter A is a bi-polar control so put it in the middle to set the frequency shift to 0.
