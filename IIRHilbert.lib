@@ -1,4 +1,4 @@
-import("math.lib");
+import("stdfaust.lib");
 
 // IIR hilbert transform Emmanuel Favreau (via Miller Puckette)
 // fastest
